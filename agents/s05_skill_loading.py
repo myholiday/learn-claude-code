@@ -75,12 +75,14 @@ class SkillLoader:
         if not match:
             return {}, text
         meta = {}
-        for line in match.group(1).strip().splitlines():
-            if ":" in line:
-                key, val = line.split(":", 1)
-                meta[key.strip()] = val.strip()
+        header = match.group(1)
+        m = re.search(r"^name:\s*(.+)", header, re.MULTILINE)
+        if m:
+            meta["name"] = m.group(1).strip()
+        m = re.search(r"^description:\s*(.+(?:\n(?![\w-]+:).*)*)", header, re.MULTILINE)
+        if m:
+            meta["description"] = m.group(1)
         return meta, match.group(2).strip()
-
     def get_descriptions(self) -> str:
         """Layer 1: short descriptions for the system prompt."""
         if not self.skills:
